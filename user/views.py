@@ -1,11 +1,11 @@
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework import status
-from rest_framework.decorators import api_view , permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 
-from user.serializers import UserSerializer
+from user.serializers import UserSerializer, PostRequestSerializer
 
 
 @api_view(['POST'])
@@ -23,10 +23,16 @@ def login_user(request):
     if request.method == 'POST':
         username = request.data.get('username')
         password = request.data.get('password')
-
-        user = authenticate(username=username, password=password)
-        if user:
+        serializer = PostRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            user = authenticate(username=username, password=password)
+            if  not user:
+                return Response({'message':'Username or password is incorrect'}, status=status.HTTP_401_UNAUTHORIZED)
+            
             token= Token.objects.get_or_create(user=user)
             return Response({'token':token[0].key}, status=status.HTTP_200_OK)
         
-        return Response({'message':'Username or password does not found'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        return Response({"message":"All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+  
