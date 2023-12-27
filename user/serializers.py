@@ -1,6 +1,4 @@
 from rest_framework import serializers
-from rest_framework.response import Response
-from rest_framework import status
 from django.contrib.auth.models import User
 from django.contrib.auth import password_validation as validators
 
@@ -23,6 +21,6 @@ class UserSerializer(serializers.ModelSerializer):
         return user
     
 
-class PostRequestSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField()
+class AuthRequestSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)

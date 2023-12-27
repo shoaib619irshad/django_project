@@ -2,10 +2,9 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 
-from user.serializers import UserSerializer, PostRequestSerializer
+from user.serializers import UserSerializer, AuthRequestSerializer
 
 
 @api_view(['POST'])
@@ -23,7 +22,7 @@ def login_user(request):
     if request.method == 'POST':
         username = request.data.get('username')
         password = request.data.get('password')
-        serializer = PostRequestSerializer(data=request.data)
+        serializer = AuthRequestSerializer(data=request.data)
         if serializer.is_valid():
             user = authenticate(username=username, password=password)
             if  not user:
@@ -34,5 +33,3 @@ def login_user(request):
         
         
         return Response({"message":"All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-  
