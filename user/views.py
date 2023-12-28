@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework import status
@@ -19,14 +20,16 @@ class AuthView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         elif request.path == '/api/user/login/':
-            username = request.data.get('username')
+            email = request.data.get('email')
             password = request.data.get('password')
             serializer = AuthRequestSerializer(data=request.data)
             if serializer.is_valid():
-                user = authenticate(username=username, password=password)
+                user = authenticate(email=email, password=password)
                 if  not user:
-                    return Response({'message':'Username or password is incorrect'}, status=status.HTTP_401_UNAUTHORIZED)
+                    return Response({'message':'Email or password is incorrect'}, status=status.HTTP_401_UNAUTHORIZED)
                 
+                user.last_login = timezone.now()
+                user.save()
                 token= Token.objects.get_or_create(user=user)
                 return Response({'token':token[0].key}, status=status.HTTP_200_OK)
             
