@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
@@ -35,3 +36,10 @@ class AuthView(APIView):
             
             
             return Response({"message":"All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        elif request.path == '/api/user/logout/':
+            user = int(request.data.get('user_id'))
+            token = get_object_or_404(Token, user=user)
+            token.delete()
+
+            return Response({"message":" User Logout successfully"}, status=status.HTTP_200_OK)
